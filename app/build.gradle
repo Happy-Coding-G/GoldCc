@@ -1,0 +1,26 @@
+plugins { id 'com.android.application' version '8.7.3' }
+android {
+    testOptions { unitTests.includeAndroidResources = true }
+    sourceSets.main.assets.srcDir(layout.buildDirectory.dir("generated/portraitAssets"))
+    namespace 'cn.goldcc.review'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+    defaultConfig {
+        applicationId 'cn.goldcc.review'
+        minSdk 24
+        targetSdk 32
+        versionCode 1
+        versionName '0.1'
+    }
+}
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+}
+
+def preparePortraits = tasks.register('preparePortraits', Exec) {
+    inputs.files(rootProject.file('tools/import_assets.py'), rootProject.file('tools/portraits.lock'))
+    outputs.dir(layout.buildDirectory.dir('generated/portraitAssets'))
+    commandLine 'python', rootProject.file('tools/import_assets.py').absolutePath
+}
+tasks.named('preBuild').configure { dependsOn preparePortraits }
